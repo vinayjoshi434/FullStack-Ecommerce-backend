@@ -22,7 +22,7 @@ Userrouter.route("/login").post(loginUser)
 
 
 //secured routes/protectedroute
-Userrouter.route("/logout").post(verifyJwt, logoutUser)
+Userrouter.route("/logout").get(verifyJwt, logoutUser)
 Userrouter.route("/me").get(verifyJwt, currentuser)
 
 

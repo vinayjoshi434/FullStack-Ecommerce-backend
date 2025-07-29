@@ -3,13 +3,12 @@ import { asynchandler } from "../utils/asynchandler.js";
 import { User } from "../models/user.models.js";
 import { uploadonCloudinary } from "../utils/cloudinary.js"
 import { Apiresponse } from "../utils/Apiresponse.js"
-
+import { getInitials } from "../utils/getinitialName.js";
 
 
 
 const register = async (req, res) => {
     //  steps to follow while registration
-
     //1- get the user data for the registration from the frontend
     //2- validate the data first  -not empty
     //3- check if user already exixts: username&email
@@ -42,6 +41,9 @@ const register = async (req, res) => {
 
     }
 
+    const defaultavatarinitial = getInitials(name)
+
+
 
     //here in this we use the operator in the mongoose to check both with email and username
     const existedUser = await User.findOne({
@@ -59,25 +61,32 @@ const register = async (req, res) => {
     const avatarlocalpath = req.files?.avatar?.[0].path
     console.log(avatarlocalpath);
 
-    if (!avatarlocalpath) {
-        throw new ApiError(400, "avatar is absent")
+    let avatar;
+
+    // if (!avatarlocalpath) {
+    //     throw new ApiError(400, "avatar is absent")
+    // }
+
+    if (avatarlocalpath) {
+        avatar = await uploadonCloudinary(avatarlocalpath)
+        console.log("in controller getting the response from uploadonCloudinary", avatar);
+
+
+        if (!avatar) {
+            throw new ApiError(400, "error in uplading on cloudinary")
+        }
+
     }
 
-    const avatar = await uploadonCloudinary(avatarlocalpath)
-    console.log("in controller getting the response from uploadonCloudinary", avatar);
-
-
-    if (!avatar) {
-        throw new ApiError(400, "error in uplading on cloudinary")
-    }
 
     const user = await User.create({
         username: username.toLowerCase(),
         name,
         email,
         password,
-        avatar: avatar?.url,
-        refreshtoken: ""
+        avatar: avatar?.url || "",
+        refreshtoken: "",
+        nameinitial: defaultavatarinitial
     })
 
     const createdUser = await User.findById(user._id).select(

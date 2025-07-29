@@ -30,11 +30,11 @@ import { Productrouter } from "./routes/product.routes.js";
 
 //route declaration
 
-app.use("/api/v1/users", Userrouter)
+app.use("/api/users", Userrouter)
 
-app.use("/api/v1/cart", Cartrouter)
+app.use("/api/cart", Cartrouter)
 
-app.use("/api/v1/product", Productrouter)
+app.use("/api/product", Productrouter)
 
 
 app.use(errorHandler)
